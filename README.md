@@ -29,6 +29,9 @@ Some prompts to answer:
 
 You can include a simple diagram or bullet list if helpful.
 
+Real-world recommenders like Spotify or YouTube usually work one of two ways: by looking at what similar users liked (collaborative filtering), or by looking at the actual attributes of the songs themselves (content-based filtering). This project is a simple content-based system — there's only one user, so it works by comparing song attributes to that user's stated preferences, rather than comparing users to each other. Each Song has four features: genre, mood, energy (0–1), and valence (0–1, how positive or negative the song feels). The UserProfile stores the same four features as preferences: preferred_genre, preferred_mood, preferred_energy, and preferred_valence.
+The Recommender scores each song by comparing it to the user's profile. Genre and mood either match or they don't, and a match adds points (genre counts for more, since it's usually the strongest signal for "vibe"). Energy and valence are scored differently — instead of rewarding high values, the system rewards songs whose energy and valence are close to what the user prefers. All songs are scored this way, sorted from highest to lowest, and the top few are returned as recommendations.
+
 ---
 
 ## Getting Started
@@ -69,14 +72,25 @@ You can add more tests in `tests/test_recommender.py`.
 ## Sample Recommendation Output
 
 Paste a sample of your recommender's output here as a text block so a reader can see what it produces:
-
 ```
-# e.g.:
-# User profile: genre=indie, mood=chill, energy=low
+
+# User profile: {"genre": "pop", "mood": "happy", "energy": 0.8}
 # Recommendations:
-#   1. ...
-#   2. ...
-#   3. ...
+
+Sunrise City - Score: 4.47
+Because: genre match (+2.0), mood match (+1.0), energy closeness (+1.47)
+
+Gym Hero - Score: 3.30
+Because: genre match (+2.0), energy closeness (+1.30)
+
+Rooftop Lights - Score: 2.44
+Because: mood match (+1.0), energy closeness (+1.44)
+
+Concrete Dreams - Score: 1.50
+Because: energy closeness (+1.50)
+
+Night Drive Loop - Score: 1.42
+Because: energy closeness (+1.42)
 ```
 
 **Screenshot or video** *(optional)*: <!-- Insert a screenshot or demo video link here -->
