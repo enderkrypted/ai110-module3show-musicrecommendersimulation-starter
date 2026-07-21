@@ -38,15 +38,40 @@ class Recommender:
     def __init__(self, songs: List[Song]):
         self.songs = songs
 
+    def _score(self, user: UserProfile, song: Song) -> Tuple[float, List[str]]:
+        """Internal helper: scores one Song against a UserProfile."""
+        score = 0.0
+        reasons = []
+
+        if user.favorite_genre == song.genre:
+            score += 2.0
+            reasons.append("genre match (+2.0)")
+
+        if user.favorite_mood == song.mood:
+            score += 1.0
+            reasons.append("mood match (+1.0)")
+
+        gap = abs(user.target_energy - song.energy)
+        energy_points = 1.5 * (1 - gap)
+        score += energy_points
+        reasons.append(f"energy closeness (+{energy_points:.2f})")
+
+        if user.likes_acoustic and song.acousticness >= 0.7:
+            score += 0.5
+            reasons.append("acoustic preference match (+0.5)")
+
+        return score, reasons
+
     def recommend(self, user: UserProfile, k: int = 5) -> List[Song]:
         """Returns the top k songs ranked against the given user profile."""
-        # TODO: Implement recommendation logic
-        return self.songs[:k]
+        scored = [(song, self._score(user, song)[0]) for song in self.songs]
+        scored.sort(key=lambda item: item[1], reverse=True)
+        return [song for song, _ in scored[:k]]
 
     def explain_recommendation(self, user: UserProfile, song: Song) -> str:
         """Explains why a given song was recommended to the user."""
-        # TODO: Implement explanation logic
-        return "Explanation placeholder"
+        _, reasons = self._score(user, song)
+        return ", ".join(reasons) if reasons else "no strong matches"
 
 def load_songs(csv_path: str) -> List[Dict]:
     """
